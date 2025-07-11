@@ -1,5 +1,5 @@
 #Get the go version we need the application to bootsrap on
-FROM golang:1.22.5-alpine
+FROM golang:1.23.3-alpine
 
 #RUN go get -u github.com/mitranim/gow
 
