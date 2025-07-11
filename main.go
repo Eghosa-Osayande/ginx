@@ -1,27 +1,47 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/subosito/gotenv"
 	"golang.org/x/crypto/acme/autocert"
+	"gopkg.in/yaml.v3"
 )
 
-// Map domains to target local servers
-var routes = map[string]string{
-	"osas.localhost:8000": "http://localhost:3001",
-	"tawoh.localhost:8000": "http://localhost:3002",
+func init() {
+	_ = gotenv.Load()
 }
 
-func main() {
-	
+type Config struct {
+	Domains map[string]string `yaml:"domains"`
+}
 
+
+
+func main() {
+
+	data, err := os.ReadFile("./servers.yml")
+	if err != nil {
+		panic(err)
+	}
+
+	var cfg Config
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
+		panic(err)
+	}
+	fmt.Println(cfg.Domains)
+	
+	
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		targetURL, ok := routes[r.Host]
-		if !ok {
+		targetURL :=  cfg.Domains[r.Host]
+
+		if targetURL == "" {
 			http.Error(w, "Unknown host: "+r.Host, http.StatusBadGateway)
 			return
 		}
@@ -54,33 +74,31 @@ func main() {
 		ginApp.Run(":3001")
 	}()
 
+	var hostList= []string{}
 
-	go func() {
-		ginApp := gin.New()
-
-		gin.SetMode(gin.ReleaseMode)
-		ginApp.GET("/", func(ctx *gin.Context) {
-			ctx.JSON(200, "tawoh")
-		})
-		ginApp.Run(":3002")
-	}()
-
-	m := &autocert.Manager{
-		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist(
-			"tawoh.com",
-			"osadolor.com",
-		),
-		Cache:      autocert.DirCache("certs"),
+	for k:=range cfg.Domains{
+		hostList = append(hostList, k)
 	}
 
+	m := &autocert.Manager{
+		Prompt: autocert.AcceptTOS,
+		HostPolicy: autocert.HostWhitelist(hostList...),
+		Cache: autocert.DirCache("certs"),
+	}
 
-	server := &http.Server{
-		Addr:      ":8000",
+	server1 := &http.Server{
+		Addr:      ":8080",
+		Handler:   handler,
+	}
+
+	server2 := &http.Server{
+		Addr:      ":8081",
 		TLSConfig: m.TLSConfig(),
 		Handler:   handler,
 	}
 
-	log.Fatal(server.ListenAndServeTLS("", ""))
+	// log.Fatal(server.ListenAndServeTLS("", ""))
+	go log.Fatal(server1.ListenAndServe())
+	log.Fatal(server2.ListenAndServeTLS("",""))
 
 }

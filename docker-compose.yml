@@ -1,0 +1,19 @@
+version: "3.8"
+
+# volumes:
+  
+
+services:
+  ginx:
+    image: ginx:${TAG:-latest}
+    tty: true
+    build:
+      context: .
+    container_name: ginx
+    env_file:
+      - .env.docker
+    volumes:
+      - .:/var/www:cached
+    ports:
+      - 8080:80
+      - 8081:443
