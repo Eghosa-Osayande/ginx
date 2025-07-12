@@ -23,8 +23,8 @@ COPY . .
 
 RUN export PATH=/go/bin
 
-RUN go build -o gigmile-hermes .
+# RUN go build -o gigmile-hermes .
 
 #serve the app
-CMD ["./gigmile-hermes"]
+CMD ["go","run,".]
 #CMD ["gow", "run", "."]
