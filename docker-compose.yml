@@ -5,7 +5,6 @@ version: "3.8"
 
 services:
   ginx:
-    image: ginx:${TAG:-latest}
     tty: true
     build:
       context: .
