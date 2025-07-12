@@ -1,7 +1,2 @@
 domains:
-  osas.localhost:8001: http://localhost:3001
-  osas.localhost:8000: http://localhost:3001
-  tawoh.localhost:8000: http://localhost:3001
-  tawoh.localhost:8001: http://localhost:3001
-  167.99.80.126: http://localhost:3001
   tawoh.com: http://localhost:3001
