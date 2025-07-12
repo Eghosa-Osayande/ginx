@@ -26,5 +26,5 @@ RUN export PATH=/go/bin
 # RUN go build -o gigmile-hermes .
 
 #serve the app
-CMD ["go","run,".]
+CMD ["go","run","."]
 #CMD ["gow", "run", "."]
