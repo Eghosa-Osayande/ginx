@@ -87,12 +87,12 @@ func main() {
 	}
 
 	server1 := &http.Server{
-		Addr:      ":8080",
+		Addr:      ":80",
 		Handler:   handler,
 	}
 
 	server2 := &http.Server{
-		Addr:      ":8081",
+		Addr:      ":443",
 		TLSConfig: m.TLSConfig(),
 		Handler:   handler,
 	}
